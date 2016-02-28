@@ -12,10 +12,12 @@ Truncates *path* to *len* characters.
 
 This snippet will include it in a `fish_prompt`
 
-<!-- language: fish -->
-    echo -n (pathtrunc $PWD 25)
+```fish
+echo -n (pathtrunc $PWD 25)
+```
 
 This one will include it in a bash `$PS1`
 
-<!-- language: bash -->
-    PS1="\$(~/bin/pathtrunc \$PWD 25)"
+```bash
+PS1="\$(~/bin/pathtrunc \$PWD 25)"
+```
