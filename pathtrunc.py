@@ -2,14 +2,29 @@
 import sys
 import argparse
 import os
+import ctypes
+
+try:
+    _wcswidth = ctypes.CDLL('libc.so.6').wcswidth
+    _wcswidth.argtypes = [ctypes.c_wchar_p, ctypes.c_size_t]
+    _wcswidth.restype = ctypes.c_int
+
+    def wcswidth(s):
+        return _wcswidth(s, len(s))
+except:
+    wcswidth = len
+
 
 def ellipsize(text, maxlen=1):
     assert maxlen > 0
 
-    if len(text) <= maxlen:
+    if wcswidth(text) <= maxlen:
         return text
     else:
-        return "{}…".format(text[:maxlen - 1])
+        n = 1
+        while wcswidth(text[:-n]) > maxlen - 1:
+            n += 1
+        return "{}…".format(text[:-n])
 
 def pathtrunc(pathtext, pathlimit):
     if pathtext.startswith('/'):
@@ -24,7 +39,7 @@ def pathtrunc(pathtext, pathlimit):
     path = pathtext.split('/')
     limit = pathlimit - len(path)
 
-    plens = list(map(len, path))
+    plens = list(map(wcswidth, path))
 
     if limit < len(path):
         return leadingslash + "/".join(map(ellipsize, path))
@@ -65,8 +80,4 @@ if __name__ == '__main__':
         if path.startswith(home):
             path = '~{}'.format(path[len(home):])
 
-    try:
-        print(pathtrunc(path, args.len))
-    except e:
-        print(e)
-        exit(0)
+    print(pathtrunc(path, args.len))
