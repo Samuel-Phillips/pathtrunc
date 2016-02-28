@@ -18,6 +18,9 @@ def pathtrunc(pathtext, pathlimit):
     else:
         leadingslash = ''
 
+    if pathtext.endswith('/'):
+        pathtext = pathtext[:-1]
+
     path = pathtext.split('/')
     limit = pathlimit - len(path)
 
@@ -27,19 +30,14 @@ def pathtrunc(pathtext, pathlimit):
         return leadingslash + "/".join(map(ellipsize, path))
     else:
         while sum(plens) > limit:
-            print(repr(plens))
             maxpl = 0
-            print('mpl = {maxpl}'.format(**locals()))
             while maxpl < len(plens) and plens[maxpl] <= 1:
                 maxpl += 1
-            print('mpl = {maxpl}'.format(**locals()))
             if maxpl == len(plens):
                 break
-            print('mpl = {maxpl}'.format(**locals()))
             for i, secl in enumerate(plens):
                 if secl - i > plens[maxpl] - maxpl and secl > 1:
                     maxpl = i
-            print('mpl = {maxpl}'.format(**locals()))
 
             if plens[maxpl] > 1:
                 plens[maxpl] -= 1
@@ -67,4 +65,8 @@ if __name__ == '__main__':
         if path.startswith(home):
             path = '~{}'.format(path[len(home):])
 
-    print(pathtrunc(path, args.len))
+    try:
+        print(pathtrunc(path, args.len))
+    except e:
+        print(e)
+        exit(0)
